@@ -47,17 +47,28 @@ public class CubeProgram {
             uniform mat4 model;
             
             layout (location = 0) in vec3 vertexPosition;
-            //
+            layout (location = 1) in vec3 vertexNormal;
             layout (location = 2) in vec2 vertexTexture;
             layout (location = 3) in vec2 vertexLightmap;
             
             out vec2 texCoords;
             out vec2 texCoordsLightmap;
+            out vec3 fragNormal;
             
             void main() {
+                vec3 lightNormal = normalize(vec3(-0.5, -1.0, 0.5));
+            
                 texCoords = vertexTexture;
                 texCoordsLightmap = vertexLightmap;
-                gl_Position = projectionView * model * vec4(vertexPosition, 1.0);
+                vec3 modelNormal = mat3(transpose(inverse(model))) * vertexNormal;
+                fragNormal = modelNormal;
+                vec3 outPos = (model * vec4(vertexPosition, 1.0)).xyz;
+                
+                if (dot(lightNormal, modelNormal) > 0){
+                    outPos = outPos + lightNormal * 50.0;
+                }
+                
+                gl_Position = projectionView * vec4(outPos, 1.0);
             }
             """;
 
@@ -73,6 +84,7 @@ public class CubeProgram {
             
             in vec2 texCoords;
             in vec2 texCoordsLightmap;
+            in vec3 fragNormal;
             
             void main() {
                 vec4 textureColor = texture(cubeTexture, texCoords);

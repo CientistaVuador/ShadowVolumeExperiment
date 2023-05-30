@@ -109,7 +109,7 @@ public class Game {
             }
 
             CubeProgram.sendPerDrawUniforms(c.getLightmap(), c.getModel());
-            glDrawElements(GL_TRIANGLES, Cube.NUMBER_OF_INDICES, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, 360, GL_UNSIGNED_INT, 0);
 
             Main.NUMBER_OF_DRAWCALLS++;
             Main.NUMBER_OF_VERTICES += Cube.NUMBER_OF_INDICES;

@@ -26,6 +26,7 @@
  */
 package cientistavuador.bakedlightingexperiment.cube;
 
+import cientistavuador.bakedlightingexperiment.util.ShadowVolumeGenerator;
 import static org.lwjgl.opengl.GL33C.*;
 
 /**
@@ -62,9 +63,14 @@ public class CubeVAO {
 
         VerticesStream stream = generateVertices(width, height);
 
+        int[] newIndices = ShadowVolumeGenerator.generateShadowVolumeIndices(stream.vertices(), Cube.VERTEX_SIZE_ELEMENTS, stream.indices());
+        
+        System.out.println(stream.indices().length*4);
+        System.out.println(newIndices.length);
+        
         int ebo = glGenBuffers();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, stream.indices(), GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, newIndices, GL_STATIC_DRAW);
 
         vbo = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
