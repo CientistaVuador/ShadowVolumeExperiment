@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector3dc;
+import org.joml.Vector3f;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL33C.*;
 
@@ -79,12 +80,12 @@ public class Game {
         Matrix4f cameraProjectionView = new Matrix4f(this.camera.getProjectionView());
 
         glUseProgram(Cube.SHADER_PROGRAM);
-        CubeProgram.sendPerFrameUniforms(Cube.CUBE_TEXTURE, cameraProjectionView);
+        CubeProgram.sendPerFrameUniforms(Cube.CUBE_TEXTURE, Cube.CUBE_TEXTURE_SPECULAR, cameraProjectionView, new Vector3f().set(camera.getPosition()), sun);
 
         for (Cube c : cubes) {
             glBindVertexArray(Cube.VAO);
 
-            CubeProgram.sendPerDrawUniforms(c.getModel());
+            CubeProgram.sendPerDrawUniforms(c.getModel(), c.getNormalModel());
             glDrawElements(GL_TRIANGLES, Cube.CUBE_SHADOW_VOLUME_COUNT, GL_UNSIGNED_INT, Cube.CUBE_SHADOW_VOLUME_OFFSET);
 
             Main.NUMBER_OF_DRAWCALLS++;

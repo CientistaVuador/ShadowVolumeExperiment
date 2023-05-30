@@ -41,6 +41,7 @@ import static org.lwjgl.opengl.GL33C.*;
 public class CubeTexture {
 
     public static final int CUBE_TEXTURE;
+    public static final int CUBE_TEXTURE_SPECULAR;
     public static final int TEXTURE_WIDTH;
     public static final int TEXTURE_HEIGHT;
     
@@ -53,6 +54,43 @@ public class CubeTexture {
         
         CUBE_TEXTURE = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, CUBE_TEXTURE);
+        glTexImage2D(
+                GL_TEXTURE_2D,
+                0,
+                GL_RGBA8,
+                TEXTURE_WIDTH,
+                TEXTURE_HEIGHT,
+                0,
+                GL_RGBA,
+                GL_UNSIGNED_BYTE,
+                cubeImage.getData()
+        );
+        cubeImage.free();
+        
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        
+        glGenerateMipmap(GL_TEXTURE_2D);
+        
+        if (USE_ANISOTROPIC_FILTERING && GL.getCapabilities().GL_EXT_texture_filter_anisotropic) {
+            glTexParameterf(
+                    GL_TEXTURE_2D,
+                    GL_TEXTURE_MAX_ANISOTROPY_EXT,
+                    glGetFloat(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT)
+            );
+        }
+        
+        glBindTexture(GL_TEXTURE_2D, 0);
+        
+        cubeImage = ImageResources.load("cube_textured_specular.png", 4);
+        
+        glActiveTexture(GL_TEXTURE0);
+        
+        CUBE_TEXTURE_SPECULAR = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, CUBE_TEXTURE_SPECULAR);
         glTexImage2D(
                 GL_TEXTURE_2D,
                 0,

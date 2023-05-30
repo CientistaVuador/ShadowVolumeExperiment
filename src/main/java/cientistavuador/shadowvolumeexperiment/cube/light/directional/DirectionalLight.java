@@ -27,6 +27,7 @@
 package cientistavuador.shadowvolumeexperiment.cube.light.directional;
 
 import cientistavuador.shadowvolumeexperiment.cube.light.Light;
+import cientistavuador.shadowvolumeexperiment.cube.light.LightMode;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
@@ -41,7 +42,9 @@ public class DirectionalLight implements Light {
     private final Vector3f direction = new Vector3f(-0.5f, -1f, 0.5f).normalize();
     private final Vector3f iconColor = new Vector3f(255f / 255f, 253f / 255f, 242f / 255f);
     private final Vector3f diffuseColor = new Vector3f(iconColor).mul(1.0f);
+    private final Vector3f specularColor = new Vector3f(iconColor).mul(0.5f);
     private final Vector3f ambientColor = new Vector3f(iconColor).mul(0.3f);
+    private final LightMode lightMode = new LightMode();
     
     public DirectionalLight(Vector3fc direction) {
         if (direction != null) {
@@ -63,13 +66,23 @@ public class DirectionalLight implements Light {
     }
 
     @Override
+    public Vector3f getDiffuseColor() {
+        return diffuseColor;
+    }
+    
+    @Override
+    public Vector3f getSpecularColor() {
+        return specularColor;
+    }
+    
+    @Override
     public Vector3f getAmbientColor() {
         return ambientColor;
     }
 
     @Override
-    public Vector3f getDiffuseColor() {
-        return diffuseColor;
+    public LightMode getLightMode() {
+        return lightMode;
     }
     
 }

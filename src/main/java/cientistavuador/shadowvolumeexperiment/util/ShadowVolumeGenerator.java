@@ -41,7 +41,8 @@ import org.joml.Vector3f;
 public class ShadowVolumeGenerator {
 
     //must be flat shaded
-    //the first 3 floats must be the position
+    //the first 3 floats must be the position XYZ
+    //slightly based on https://gamedev.stackexchange.com/questions/106742/generate-mesh-of-shadow-volume
     public static int[] generateShadowVolumeIndices(float[] vertices, int vertexSize, int[] indices) {
         //1-map the indices by the positions
         Map<Vector3f, List<Vector2i>> positionMap = new HashMap<>();

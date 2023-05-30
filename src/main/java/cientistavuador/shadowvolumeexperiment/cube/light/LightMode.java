@@ -24,46 +24,66 @@
  *
  * For more information, please refer to <https://unlicense.org>
  */
-package cientistavuador.shadowvolumeexperiment.cube;
-
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
-import org.joml.Matrix4fc;
+package cientistavuador.shadowvolumeexperiment.cube.light;
 
 /**
  *
  * @author Cien
  */
-public class Cube {
-
+public class LightMode {
+    private boolean diffuse = true;
+    private boolean specular = true;
+    private boolean ambient = true;
     
-    public static final int CUBE_TEXTURE = CubeTexture.CUBE_TEXTURE;
-    public static final int CUBE_TEXTURE_SPECULAR = CubeTexture.CUBE_TEXTURE_SPECULAR;
-    public static final int SHADER_PROGRAM = CubeProgram.SHADER_PROGRAM;
-    public static final int VAO = CubeVAO.VAO;
-    public static final int CUBE_COUNT = CubeVAO.CUBE_COUNT;
-    public static final int CUBE_OFFSET = CubeVAO.CUBE_OFFSET;
-    public static final int CUBE_SHADOW_VOLUME_COUNT = CubeVAO.CUBE_SHADOW_VOLUME_COUNT;
-    public static final int CUBE_SHADOW_VOLUME_OFFSET = CubeVAO.CUBE_SHADOW_VOLUME_OFFSET;
-    
-    public static void init() {
+    public LightMode() {
         
     }
-
-    private final Matrix4f model = new Matrix4f();
-    private final Matrix3f normalModel = new Matrix3f();
     
-    public Cube(Matrix4fc model) {
-        this.model.set(model);
-        this.normalModel.set(new Matrix4f(model).invert().transpose());
-    }
-
-    public Matrix4f getModel() {
-        return model;
-    }
-
-    public Matrix3f getNormalModel() {
-        return normalModel;
+    public void enableAll() {
+        this.diffuse = true;
+        this.specular = true;
+        this.ambient = true;
     }
     
+    public void disableAll() {
+        this.diffuse = false;
+        this.specular = false;
+        this.ambient = false;
+    }
+    
+    public void ambientOnly() {
+        this.diffuse = false;
+        this.specular = false;
+        this.ambient = true;
+    }
+    
+    public void diffuseSpecularOnly() {
+        this.diffuse = true;
+        this.specular = true;
+        this.ambient = false;
+    }
+    
+    public boolean diffuse() {
+        return this.diffuse;
+    }
+    
+    public boolean specular() {
+        return this.specular;
+    }
+    
+    public boolean ambient() {
+        return this.ambient;
+    }
+    
+    public void diffuse(boolean enabled) {
+        this.diffuse = enabled;
+    }
+    
+    public void specular(boolean enabled) {
+        this.specular = enabled;
+    }
+    
+    public void ambient(boolean enabled) {
+        this.ambient = enabled;
+    }
 }

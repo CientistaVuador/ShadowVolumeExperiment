@@ -35,6 +35,8 @@ import org.joml.Vector3fc;
  */
 public interface Light {
     public Vector3fc getPosition();
+    public LightMode getLightMode();
     public Vector3f getAmbientColor();
+    public Vector3f getSpecularColor();
     public Vector3f getDiffuseColor();
 }
