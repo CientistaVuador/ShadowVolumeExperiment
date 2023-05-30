@@ -64,9 +64,9 @@ public class CubeProgram {
                 fragNormal = modelNormal;
                 vec3 outPos = (model * vec4(vertexPosition, 1.0)).xyz;
                 
-                //if (dot(lightNormal, modelNormal) > 0){
-                //    outPos = outPos + lightNormal * 500.0;
-                //}
+                if (dot(lightNormal, modelNormal) > 0){
+                    outPos = outPos + lightNormal * 500.0;
+                }
                 
                 gl_Position = projectionView * vec4(outPos, 1.0);
             }

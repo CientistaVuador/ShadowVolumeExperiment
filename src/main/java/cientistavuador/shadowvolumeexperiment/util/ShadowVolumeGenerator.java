@@ -80,125 +80,65 @@ public class ShadowVolumeGenerator {
 
             generatedIndicesIndex += 3;
 
-            //first triangle
-            cache.set(
-                    vertices[(vertB * vertexSize) + 0],
-                    vertices[(vertB * vertexSize) + 1],
-                    vertices[(vertB * vertexSize) + 2]
-            );
-            List<Vector2i> indexList = positionMap.get(cache);
-            for (Vector2i vertX : indexList) {
-                if (vertX.x() == vertB && vertX.y() == i) {
-                    continue;
-                }
-
-                cache.set(
-                        vertices[(vertA * vertexSize) + 0],
-                        vertices[(vertA * vertexSize) + 1],
-                        vertices[(vertA * vertexSize) + 2]
-                );
-                List<Vector2i> otherList = positionMap.get(cache);
-                boolean found = false;
-                for (Vector2i o:otherList) {
-                    if (o.y() == vertX.y()) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    continue;
-                }
-
-                if ((generatedIndicesIndex + 3) > generatedIndices.length) {
-                    generatedIndices = Arrays.copyOf(generatedIndices, (generatedIndices.length * 2) + 3);
-                }
-
-                generatedIndices[generatedIndicesIndex + 0] = vertA;
-                generatedIndices[generatedIndicesIndex + 1] = vertX.x();
-                generatedIndices[generatedIndicesIndex + 2] = vertB;
-
-                generatedIndicesIndex += 3;
-            }
-
-            //second triangle
-            cache.set(
-                    vertices[(vertC * vertexSize) + 0],
-                    vertices[(vertC * vertexSize) + 1],
-                    vertices[(vertC * vertexSize) + 2]
-            );
-            indexList = positionMap.get(cache);
-            for (Vector2i vertX : indexList) {
-                if (vertX.x() == vertC && vertX.y() == i) {
-                    continue;
-                }
-
-                cache.set(
-                        vertices[(vertB * vertexSize) + 0],
-                        vertices[(vertB * vertexSize) + 1],
-                        vertices[(vertB * vertexSize) + 2]
-                );
-                List<Vector2i> otherList = positionMap.get(cache);
-                boolean found = false;
-                for (Vector2i o:otherList) {
-                    if (o.y() == vertX.y()) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    continue;
-                }
+            for (int j = 0; j < 3; j++) {
+                int vA = 0;
+                int vB = 0;
                 
-                if ((generatedIndicesIndex + 3) > generatedIndices.length) {
-                    generatedIndices = Arrays.copyOf(generatedIndices, (generatedIndices.length * 2) + 3);
-                }
-
-                generatedIndices[generatedIndicesIndex + 0] = vertB;
-                generatedIndices[generatedIndicesIndex + 1] = vertX.x();
-                generatedIndices[generatedIndicesIndex + 2] = vertC;
-
-                generatedIndicesIndex += 3;
-            }
-
-            //third triangle
-            cache.set(
-                    vertices[(vertA * vertexSize) + 0],
-                    vertices[(vertA * vertexSize) + 1],
-                    vertices[(vertA * vertexSize) + 2]
-            );
-            indexList = positionMap.get(cache);
-            for (Vector2i vertX : indexList) {
-                if (vertX.x() == vertA && vertX.y() == i) {
-                    continue;
+                switch (j) {
+                    case 0 -> {
+                        vA = vertA;
+                        vB = vertB;
+                    }
+                    case 1 -> {
+                        vA = vertB;
+                        vB = vertC;
+                    }
+                    case 2 -> {
+                        vA = vertC;
+                        vB = vertA;
+                    }
                 }
                 
                 cache.set(
-                        vertices[(vertC * vertexSize) + 0],
-                        vertices[(vertC * vertexSize) + 1],
-                        vertices[(vertC * vertexSize) + 2]
+                        vertices[(vB * vertexSize) + 0],
+                        vertices[(vB * vertexSize) + 1],
+                        vertices[(vB * vertexSize) + 2]
                 );
-                List<Vector2i> otherList = positionMap.get(cache);
-                boolean found = false;
-                for (Vector2i o:otherList) {
-                    if (o.y() == vertX.y()) {
-                        found = true;
-                        break;
+                List<Vector2i> indexList = positionMap.get(cache);
+                for (Vector2i vX : indexList) {
+                    if (vX.x() == vB && vX.y() == i) {
+                        continue;
                     }
-                }
-                if (!found) {
-                    continue;
-                }
 
-                if ((generatedIndicesIndex + 3) > generatedIndices.length) {
-                    generatedIndices = Arrays.copyOf(generatedIndices, (generatedIndices.length * 2) + 3);
+                    cache.set(
+                            vertices[(vA * vertexSize) + 0],
+                            vertices[(vA * vertexSize) + 1],
+                            vertices[(vA * vertexSize) + 2]
+                    );
+                    List<Vector2i> otherList = positionMap.get(cache);
+                    boolean found = false;
+                    for (Vector2i o : otherList) {
+                        if (o.y() == vX.y()) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        continue;
+                    }
+
+                    if ((generatedIndicesIndex + 3) > generatedIndices.length) {
+                        generatedIndices = Arrays.copyOf(generatedIndices, (generatedIndices.length * 2) + 3);
+                    }
+
+                    generatedIndices[generatedIndicesIndex + 0] = vA;
+                    generatedIndices[generatedIndicesIndex + 1] = vX.x();
+                    generatedIndices[generatedIndicesIndex + 2] = vB;
+
+                    generatedIndicesIndex += 3;
                 }
-
-                generatedIndices[generatedIndicesIndex + 0] = vertC;
-                generatedIndices[generatedIndicesIndex + 1] = vertX.x();
-                generatedIndices[generatedIndicesIndex + 2] = vertA;
-
-                generatedIndicesIndex += 3;
             }
+            
         }
 
         //3-done

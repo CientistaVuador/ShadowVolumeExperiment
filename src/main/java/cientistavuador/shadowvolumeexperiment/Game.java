@@ -85,17 +85,17 @@ public class Game {
             glBindVertexArray(Cube.VAO);
 
             CubeProgram.sendPerDrawUniforms(c.getModel());
-            glDrawElements(GL_TRIANGLES, Cube.CUBE_COUNT, GL_UNSIGNED_INT, Cube.CUBE_OFFSET);
+            glDrawElements(GL_TRIANGLES, Cube.CUBE_SHADOW_VOLUME_COUNT, GL_UNSIGNED_INT, Cube.CUBE_SHADOW_VOLUME_OFFSET);
 
             Main.NUMBER_OF_DRAWCALLS++;
-            Main.NUMBER_OF_VERTICES += Cube.CUBE_COUNT;
+            Main.NUMBER_OF_VERTICES += Cube.CUBE_SHADOW_VOLUME_COUNT;
 
             glBindVertexArray(0);
         }
         glUseProgram(0);
         
         AabRender.renderQueue(camera);
-
+        
         if (this.textEnabled) {
             GLFontRenderer.render(-1f, 0.90f,
                     new GLFontSpecification[]{
