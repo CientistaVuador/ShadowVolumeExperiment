@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>cientistavuador</groupId>
   <artifactId>ShadowVolumeExperiment</artifactId>
-  <version>0.1</version>
+  <version>0.3</version>
   <build>
     <resources>
       <resource>
@@ -57,7 +57,7 @@
     </dependencies>
   </dependencyManagement>
   <properties>
-    <exec.mainClass>cientistavuador.bakedlightingexperiment.MainWrapper</exec.mainClass>
+    <exec.mainClass>cientistavuador.shadowvolumeexperiment.MainWrapper</exec.mainClass>
     <maven.compiler.source>17</maven.compiler.source>
     <lwjgl.natives>natives-windows</lwjgl.natives>
     <joml.version>1.10.5</joml.version>

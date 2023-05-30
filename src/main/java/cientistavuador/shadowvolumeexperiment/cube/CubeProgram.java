@@ -64,9 +64,9 @@ public class CubeProgram {
                 fragNormal = modelNormal;
                 vec3 outPos = (model * vec4(vertexPosition, 1.0)).xyz;
                 
-                if (dot(lightNormal, modelNormal) > 0){
-                    outPos = outPos + lightNormal * 500.0;
-                }
+                //if (dot(lightNormal, modelNormal) > 0){
+                //    outPos = outPos + lightNormal * 500.0;
+                //}
                 
                 gl_Position = projectionView * vec4(outPos, 1.0);
             }
@@ -78,7 +78,6 @@ public class CubeProgram {
             #version 330 core
             
             uniform sampler2D cubeTexture;
-            uniform sampler2D lightmapTexture;
             
             layout (location = 0) out vec4 outputColor;
             
@@ -89,13 +88,6 @@ public class CubeProgram {
             void main() {
                 vec4 textureColor = texture(cubeTexture, texCoords);
                 
-                textureColor.rgb = pow(textureColor.rgb, vec3(2.2));
-                
-                vec3 lightColor = texture(lightmapTexture, texCoordsLightmap).rgb;
-                textureColor.rgb *= lightColor;
-                
-                textureColor.rgb = pow(textureColor.rgb, vec3(1.0/2.2));
-                
                 outputColor = textureColor;
             }
             """;
@@ -104,7 +96,6 @@ public class CubeProgram {
     public static final int PROJECTION_VIEW_INDEX = glGetUniformLocation(SHADER_PROGRAM, "projectionView");
     public static final int MODEL_INDEX = glGetUniformLocation(SHADER_PROGRAM, "model");
     public static final int CUBE_TEXTURE_INDEX = glGetUniformLocation(SHADER_PROGRAM, "cubeTexture");
-    public static final int LIGHTMAP_TEXTURE_INDEX = glGetUniformLocation(SHADER_PROGRAM, "lightmapTexture");
     
     private static void sendMatrix(int location, Matrix4fc matrix) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -122,12 +113,8 @@ public class CubeProgram {
         glUniform1i(CUBE_TEXTURE_INDEX, 0);
     }
 
-    public static void sendPerDrawUniforms(int lightmapTexture, Matrix4fc model) {
+    public static void sendPerDrawUniforms(Matrix4fc model) {
         sendMatrix(MODEL_INDEX, model);
-        
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, lightmapTexture);
-        glUniform1i(LIGHTMAP_TEXTURE_INDEX, 1);
     }
     
     private CubeProgram() {

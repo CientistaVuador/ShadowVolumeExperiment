@@ -44,32 +44,24 @@ public class VerticesStream {
 
     private final int textureWidth;
     private final int textureHeight;
-    private final int lightmapWidth;
-    private final int lightmapHeight;
     
     private final float texScaleX;
     private final float texScaleY;
-    private final float mapScaleX;
-    private final float mapScaleY;
 
-    public VerticesStream(int textureWidth, int textureHeight, int lightmapWidth, int lightmapHeight) {
+    public VerticesStream(int textureWidth, int textureHeight) {
         this.textureWidth = textureWidth;
         this.textureHeight = textureHeight;
-        this.lightmapWidth = lightmapWidth;
-        this.lightmapHeight = lightmapHeight;
         
         this.texScaleX = textureWidth / 512f;
         this.texScaleY = textureHeight / 512f;
-        this.mapScaleX = lightmapWidth / 512f;
-        this.mapScaleY = lightmapHeight / 512f;
     }
 
     public VerticesStream() {
-        this(512, 512, 512, 512);
+        this(512, 512);
     }
     
     public int numberOfVertices() {
-        return this.verticesIndex / Cube.VERTEX_SIZE_ELEMENTS;
+        return this.verticesIndex / CubeVAO.VERTEX_SIZE_ELEMENTS;
     }
     
     public int numberOfIndices() {
@@ -81,8 +73,8 @@ public class VerticesStream {
     }
     
     public void vertex(float x, float y, float z, float nX, float nY, float nZ, float texX, float texY, float cornerX, float cornerY) {
-        if ((this.verticesIndex + Cube.VERTEX_SIZE_ELEMENTS) > this.vertices.length) {
-            this.vertices = Arrays.copyOf(this.vertices, (this.vertices.length * 2) + Cube.VERTEX_SIZE_ELEMENTS);
+        if ((this.verticesIndex + CubeVAO.VERTEX_SIZE_ELEMENTS) > this.vertices.length) {
+            this.vertices = Arrays.copyOf(this.vertices, (this.vertices.length * 2) + CubeVAO.VERTEX_SIZE_ELEMENTS);
         }
         
         this.vertices[this.verticesIndex + 0] = x;
@@ -94,21 +86,11 @@ public class VerticesStream {
         
         float colorX = ((floor(texX * this.texScaleX) + ((floor(this.texScaleX) - 1) * cornerX)) + 0.5f) / this.textureWidth;
         float colorY = ((floor(texY * this.texScaleY) + ((floor(this.texScaleY) - 1) * cornerY)) + 0.5f) / this.textureHeight;
-        float mapX = ((floor(texX * this.mapScaleX) + ((floor(this.mapScaleX) - 1) * cornerX)) + 0.5f) / this.lightmapWidth;
-        float mapY = ((floor(texY * this.mapScaleY) + ((floor(this.mapScaleY) - 1) * cornerY)) + 0.5f) / this.lightmapHeight;
         
         this.vertices[this.verticesIndex + 6] = colorX;
         this.vertices[this.verticesIndex + 7] = colorY;
-        this.vertices[this.verticesIndex + 8] = mapX;
-        this.vertices[this.verticesIndex + 9] = mapY;
         
-        float mapPosX = mapX + ((0.5f / this.lightmapWidth) * ((cornerX - 0.5f) * 2f));
-        float mapPosY = mapY + ((0.5f / this.lightmapHeight) * ((cornerY - 0.5f) * 2f));
-        
-        this.vertices[this.verticesIndex + 10] = (mapPosX * 2f) - 1f;
-        this.vertices[this.verticesIndex + 11] = (mapPosY * 2f) - 1f;
-        
-        this.verticesIndex += Cube.VERTEX_SIZE_ELEMENTS;
+        this.verticesIndex += CubeVAO.VERTEX_SIZE_ELEMENTS;
     }
     
     public void index(int index) {
@@ -157,7 +139,7 @@ public class VerticesStream {
     }
 
     public void offset() {
-        this.offset = (this.verticesIndex / Cube.VERTEX_SIZE_ELEMENTS);
+        this.offset = (this.verticesIndex / CubeVAO.VERTEX_SIZE_ELEMENTS);
     }
 
     public float[] vertices() {

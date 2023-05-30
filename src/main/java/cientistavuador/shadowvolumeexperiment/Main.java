@@ -27,7 +27,6 @@
 package cientistavuador.shadowvolumeexperiment;
 
 import cientistavuador.shadowvolumeexperiment.cube.Cube;
-import cientistavuador.shadowvolumeexperiment.cube.light.icon.IconProgram;
 import cientistavuador.shadowvolumeexperiment.text.GLFonts;
 import cientistavuador.shadowvolumeexperiment.ubo.UBOBindingPoints;
 import java.io.PrintStream;
@@ -263,7 +262,6 @@ public class Main {
         
         GLFonts.init(); //static initialize
         Cube.init(); //static initialize
-        IconProgram.init(); //static initialize
         Game.get(); //static initialize
 
         Main.checkGLError();

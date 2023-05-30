@@ -29,7 +29,6 @@ package cientistavuador.shadowvolumeexperiment;
 import cientistavuador.shadowvolumeexperiment.camera.FreeCamera;
 import cientistavuador.shadowvolumeexperiment.cube.Cube;
 import cientistavuador.shadowvolumeexperiment.cube.CubeProgram;
-import cientistavuador.shadowvolumeexperiment.cube.CubeVAO;
 import cientistavuador.shadowvolumeexperiment.cube.light.directional.DirectionalLight;
 import cientistavuador.shadowvolumeexperiment.ubo.CameraUBO;
 import cientistavuador.shadowvolumeexperiment.ubo.UBOBindingPoints;
@@ -72,7 +71,7 @@ public class Game {
         Matrix4f model = new Matrix4f()
                 .translate(0f, -0.5f, 0f)
                 .scale(50f, 1f, 50f);
-        cubes.add(new Cube(model, true));
+        cubes.add(new Cube(model));
     }
 
     public void loop() {
@@ -83,17 +82,13 @@ public class Game {
         CubeProgram.sendPerFrameUniforms(Cube.CUBE_TEXTURE, cameraProjectionView);
 
         for (Cube c : cubes) {
-            if (c.isGroundCube()) {
-                glBindVertexArray(CubeVAO.GROUND_CUBE_VAO);
-            } else {
-                glBindVertexArray(Cube.VAO);
-            }
+            glBindVertexArray(Cube.VAO);
 
-            CubeProgram.sendPerDrawUniforms(c.getLightmap(), c.getModel());
-            glDrawElements(GL_TRIANGLES, 360, GL_UNSIGNED_INT, 0);
+            CubeProgram.sendPerDrawUniforms(c.getModel());
+            glDrawElements(GL_TRIANGLES, Cube.CUBE_COUNT, GL_UNSIGNED_INT, Cube.CUBE_OFFSET);
 
             Main.NUMBER_OF_DRAWCALLS++;
-            Main.NUMBER_OF_VERTICES += Cube.NUMBER_OF_INDICES;
+            Main.NUMBER_OF_VERTICES += Cube.CUBE_COUNT;
 
             glBindVertexArray(0);
         }
@@ -161,14 +156,11 @@ public class Game {
                             (float) (Math.random() * (Math.PI * 2.0))
                     )
                     .scale((float) (Math.random() * 2.5) + 0.5f);
-            cubes.add(new Cube(model, false));
+            cubes.add(new Cube(model));
         }
         if (key == GLFW_KEY_R && action == GLFW_PRESS) {
             if (cubes.size() > 1) {
-                Cube c = cubes.remove(cubes.size() - 1);
-                if (c != null) {
-                    c.free();
-                }
+                cubes.remove(cubes.size() - 1);
             }
         }
         if (key == GLFW_KEY_T && action == GLFW_PRESS) {

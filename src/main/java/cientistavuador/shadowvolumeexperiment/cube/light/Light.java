@@ -26,9 +26,6 @@
  */
 package cientistavuador.shadowvolumeexperiment.cube.light;
 
-import cientistavuador.shadowvolumeexperiment.cube.light.icon.IconType;
-import cientistavuador.shadowvolumeexperiment.cube.Cube;
-import java.util.List;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
@@ -38,12 +35,6 @@ import org.joml.Vector3fc;
  */
 public interface Light {
     public Vector3fc getPosition();
-    public Vector3f getIconColor();
     public Vector3f getAmbientColor();
     public Vector3f getDiffuseColor();
-    public boolean isEnabled();
-    public void setEnabled(boolean enabled);
-    public void render(Cube cube, int lightmap);
-    public void renderShadowMap(List<Cube> cubes);
-    public IconType getIconType();
 }

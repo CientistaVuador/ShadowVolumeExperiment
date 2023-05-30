@@ -26,18 +26,9 @@
  */
 package cientistavuador.shadowvolumeexperiment.cube.light.directional;
 
-import cientistavuador.shadowvolumeexperiment.Main;
-import cientistavuador.shadowvolumeexperiment.camera.OrthoCamera;
-import cientistavuador.shadowvolumeexperiment.cube.Cube;
-import cientistavuador.shadowvolumeexperiment.cube.CubeVAO;
-import cientistavuador.shadowvolumeexperiment.cube.light.icon.IconType;
 import cientistavuador.shadowvolumeexperiment.cube.light.Light;
-import cientistavuador.shadowvolumeexperiment.cube.light.ShadowMap2DFBO;
-import java.util.List;
-import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import static org.lwjgl.opengl.GL33C.*;
 
 /**
  *
@@ -47,28 +38,15 @@ public class DirectionalLight implements Light {
     
     private static final Vector3f position = new Vector3f(0f);
     
-    private final OrthoCamera camera = new OrthoCamera();
     private final Vector3f direction = new Vector3f(-0.5f, -1f, 0.5f).normalize();
     private final Vector3f iconColor = new Vector3f(255f / 255f, 253f / 255f, 242f / 255f);
     private final Vector3f diffuseColor = new Vector3f(iconColor).mul(1.0f);
     private final Vector3f ambientColor = new Vector3f(iconColor).mul(0.3f);
-    private boolean enabled = true;
     
     public DirectionalLight(Vector3fc direction) {
         if (direction != null) {
             this.direction.set(direction);
         }
-        camera.setFront(this.direction);
-        camera.setPosition(
-                new Vector3d()
-                .set(this.direction)
-                .negate()
-                .mul(200f)
-                .add(0f, 0f, 0f)
-        );
-        camera.setDimensions(100, 100);
-        camera.setNearPlane(0f);
-        camera.setFarPlane(500f);
     }
     
     public DirectionalLight() {
@@ -76,17 +54,8 @@ public class DirectionalLight implements Light {
     }
 
     @Override
-    public Vector3f getIconColor() {
-        return this.iconColor;
-    }
-    
-    @Override
     public Vector3fc getPosition() {
         return DirectionalLight.position;
-    }
-    
-    public OrthoCamera getCamera() {
-        return camera;
     }
     
     public Vector3f getDirection() {
@@ -101,68 +70,6 @@ public class DirectionalLight implements Light {
     @Override
     public Vector3f getDiffuseColor() {
         return diffuseColor;
-    }
-    
-    @Override
-    public void render(Cube cube, int lightmap) {
-        glUseProgram(DirectionalLightProgram.SHADER_PROGRAM);
-        glBindVertexArray(Cube.VAO);
-        
-        DirectionalLightProgram.sendUniforms(lightmap, cube.getModel(), cube.getNormalModel(), this);
-        glDrawElements(GL_TRIANGLES, Cube.NUMBER_OF_INDICES, GL_UNSIGNED_INT, 0);
-        
-        Main.NUMBER_OF_DRAWCALLS++;
-        Main.NUMBER_OF_VERTICES += Cube.NUMBER_OF_INDICES;
-        
-        glBindVertexArray(0);
-        glUseProgram(0);
-    }
-    
-    @Override
-    public void renderShadowMap(List<Cube> cubes) {
-        ShadowMap2DFBO.updateShadowMapSize(ShadowMap2DFBO.DEFAULT_WIDTH, ShadowMap2DFBO.DEFAULT_HEIGHT);
-        
-        this.camera.setFront(this.direction);
-        
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ShadowMap2DFBO.fbo());
-        glViewport(0, 0, ShadowMap2DFBO.width(), ShadowMap2DFBO.height());
-        
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glUseProgram(DirectionalLightShadowProgram.SHADER_PROGRAM);
-        
-        DirectionalLightShadowProgram.sendPerFrameUniforms(this.camera.getProjectionViewFloat());
-        
-        for (Cube c:cubes) {
-            if (c.isGroundCube()) {
-                glBindVertexArray(CubeVAO.GROUND_CUBE_VAO);
-            } else {
-                glBindVertexArray(CubeVAO.VAO);
-            }
-            DirectionalLightShadowProgram.sendPerDrawUniforms(c.getModel());
-            
-            glDrawElements(GL_TRIANGLES, Cube.NUMBER_OF_INDICES, GL_UNSIGNED_INT, 0);
-            glBindVertexArray(0);
-        }
-        
-        glUseProgram(0);
-        glViewport(0, 0, Main.WIDTH, Main.HEIGHT);
-        
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return this.enabled;
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    @Override
-    public IconType getIconType() {
-        return IconType.NONE;
     }
     
 }
