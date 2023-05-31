@@ -29,6 +29,7 @@ package cientistavuador.shadowvolumeexperiment;
 import cientistavuador.shadowvolumeexperiment.camera.FreeCamera;
 import cientistavuador.shadowvolumeexperiment.cube.Cube;
 import cientistavuador.shadowvolumeexperiment.cube.CubeProgram;
+import cientistavuador.shadowvolumeexperiment.cube.CubeShadowVolumeProgram;
 import cientistavuador.shadowvolumeexperiment.cube.light.directional.DirectionalLight;
 import cientistavuador.shadowvolumeexperiment.ubo.CameraUBO;
 import cientistavuador.shadowvolumeexperiment.ubo.UBOBindingPoints;
@@ -60,6 +61,7 @@ public class Game {
     private final DirectionalLight sun = new DirectionalLight();
     private final List<Cube> cubes = new ArrayList<>();
     private boolean textEnabled = true;
+    private boolean showShadowVolumes = false;
 
     private Game() {
 
@@ -75,34 +77,127 @@ public class Game {
         cubes.add(new Cube(model));
     }
 
-    public void loop() {
-        camera.updateMovement();
+    private void renderShadowVolumes() {
         Matrix4f cameraProjectionView = new Matrix4f(this.camera.getProjectionView());
 
-        glUseProgram(Cube.SHADER_PROGRAM);
-        CubeProgram.sendPerFrameUniforms(Cube.CUBE_TEXTURE, Cube.CUBE_TEXTURE_SPECULAR, cameraProjectionView, new Vector3f().set(camera.getPosition()), sun);
+        glUseProgram(CubeShadowVolumeProgram.SHADER_PROGRAM);
+        CubeShadowVolumeProgram.sendPerFrameUniforms(cameraProjectionView, sun);
 
+        glBindVertexArray(Cube.VAO);
         for (Cube c : cubes) {
-            glBindVertexArray(Cube.VAO);
-
-            CubeProgram.sendPerDrawUniforms(c.getModel(), c.getNormalModel());
+            CubeShadowVolumeProgram.sendPerDrawUniforms(c.getModel(), c.getNormalModel());
             glDrawElements(GL_TRIANGLES, Cube.CUBE_SHADOW_VOLUME_COUNT, GL_UNSIGNED_INT, Cube.CUBE_SHADOW_VOLUME_OFFSET);
 
             Main.NUMBER_OF_DRAWCALLS++;
             Main.NUMBER_OF_VERTICES += Cube.CUBE_SHADOW_VOLUME_COUNT;
-
-            glBindVertexArray(0);
         }
+        glBindVertexArray(0);
+
+        glUseProgram(0);
+    }
+
+    public void loop() {
+        camera.updateMovement();
+        Matrix4f cameraProjectionView = new Matrix4f(this.camera.getProjectionView());
+
+        if (glfwGetKey(Main.WINDOW_POINTER, GLFW_KEY_SPACE) == GLFW_PRESS) {
+            this.sun.getDirection().set(this.camera.getFront());
+        }
+
+        glStencilFunc(GL_ALWAYS, 0, 0xFF);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        
+        //render ambient only
+        sun.getLightMode().ambientOnly();
+        glUseProgram(Cube.SHADER_PROGRAM);
+        CubeProgram.sendPerFrameUniforms(Cube.CUBE_TEXTURE, Cube.CUBE_TEXTURE_SPECULAR, cameraProjectionView, new Vector3f().set(camera.getPosition()), sun);
+        glBindVertexArray(Cube.VAO);
+        for (Cube c : cubes) {
+            CubeProgram.sendPerDrawUniforms(c.getModel(), c.getNormalModel());
+            glDrawElements(GL_TRIANGLES, Cube.CUBE_COUNT, GL_UNSIGNED_INT, Cube.CUBE_OFFSET);
+
+            Main.NUMBER_OF_DRAWCALLS++;
+            Main.NUMBER_OF_VERTICES += Cube.CUBE_COUNT;
+        }
+        glBindVertexArray(0);
+        glUseProgram(0);
+        //
+        
+        
+        //render shadow volumes to the stencil buffer (z-fail method)
+        glDepthFunc(GL_LESS);
+        glStencilFunc(GL_ALWAYS, 0, 0xFF);
+        {
+            glDepthMask(false);
+            glColorMask(false, false, false, false);
+            {
+                glCullFace(GL_FRONT);
+                glStencilOp(GL_KEEP, GL_INCR, GL_KEEP);
+                renderShadowVolumes();
+            }
+            {
+                glCullFace(GL_BACK);
+                glStencilOp(GL_KEEP, GL_DECR, GL_KEEP);
+                renderShadowVolumes();
+            }
+            glColorMask(true, true, true, true);
+            glDepthMask(true);
+        }
+        glStencilFunc(GL_EQUAL, 0, 0xFF);
+        glDepthFunc(GL_LEQUAL);
+
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        //
+        
+        
+        //render light again
+        sun.getLightMode().enableAll();
+        glUseProgram(Cube.SHADER_PROGRAM);
+        CubeProgram.sendPerFrameUniforms(Cube.CUBE_TEXTURE, Cube.CUBE_TEXTURE_SPECULAR, cameraProjectionView, new Vector3f().set(camera.getPosition()), sun);
+
+        glBindVertexArray(Cube.VAO);
+        for (Cube c : cubes) {
+            CubeProgram.sendPerDrawUniforms(c.getModel(), c.getNormalModel());
+            glDrawElements(GL_TRIANGLES, Cube.CUBE_COUNT, GL_UNSIGNED_INT, Cube.CUBE_OFFSET);
+
+            Main.NUMBER_OF_DRAWCALLS++;
+            Main.NUMBER_OF_VERTICES += Cube.CUBE_COUNT;
+        }
+        glBindVertexArray(0);
         glUseProgram(0);
         
-        AabRender.renderQueue(camera);
+        glStencilFunc(GL_ALWAYS, 0, 0xFF);
+        //
         
+        
+        //render shadow volumes
+        if (this.showShadowVolumes) {
+            glDepthFunc(GL_LESS);
+
+            glUseProgram(CubeShadowVolumeProgram.SHADER_PROGRAM);
+            CubeShadowVolumeProgram.sendPerFrameUniforms(cameraProjectionView, sun);
+            glBindVertexArray(Cube.VAO);
+            for (Cube c : cubes) {
+                CubeShadowVolumeProgram.sendPerDrawUniforms(c.getModel(), c.getNormalModel());
+                glDrawElements(GL_TRIANGLES, Cube.CUBE_SHADOW_VOLUME_COUNT, GL_UNSIGNED_INT, Cube.CUBE_SHADOW_VOLUME_OFFSET);
+
+                Main.NUMBER_OF_DRAWCALLS++;
+                Main.NUMBER_OF_VERTICES += Cube.CUBE_SHADOW_VOLUME_COUNT;
+            }
+            glBindVertexArray(0);
+            glUseProgram(0);
+
+            glDepthFunc(GL_LEQUAL);
+        }
+        //
+
+        AabRender.renderQueue(camera);
+
         if (this.textEnabled) {
             GLFontRenderer.render(-1f, 0.90f,
                     new GLFontSpecification[]{
                         GLFontSpecifications.OPENSANS_ITALIC_0_10_BANANA_YELLOW,
-                        GLFontSpecifications.ROBOTO_THIN_0_05_WHITE,
-                    },
+                        GLFontSpecifications.ROBOTO_THIN_0_05_WHITE,},
                     new String[]{
                         "ShadowVolumeExperiment\n",
                         new StringBuilder()
@@ -118,6 +213,8 @@ public class Game {
                                 .append("\tF - Spawn Cube\n")
                                 .append("\tR - Remove Last Cube").append(" [").append(this.cubes.size() - 1).append(" Cubes]\n")
                                 .append("\tT - Hide This Wall of Text.\n")
+                                .append("\tV - ").append((this.showShadowVolumes ? "Hide" : "Show")).append(" Shadow Volumes.\n")
+                                .append("\tSpace - Change Light Direction.\n")
                                 .toString()
                     }
             );
@@ -167,9 +264,12 @@ public class Game {
         if (key == GLFW_KEY_T && action == GLFW_PRESS) {
             this.textEnabled = !this.textEnabled;
         }
+        if (key == GLFW_KEY_V && action == GLFW_PRESS) {
+            this.showShadowVolumes = !this.showShadowVolumes;
+        }
     }
 
     public void mouseCallback(long window, int button, int action, int mods) {
-        
+
     }
 }

@@ -240,6 +240,7 @@ public class Main {
         if (USE_MSAA) {
             glEnable(GL_MULTISAMPLE);
         }
+        glEnable(GL_STENCIL_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glClearColor(DEFAULT_CLEAR_COLOR.x(), DEFAULT_CLEAR_COLOR.y(), DEFAULT_CLEAR_COLOR.z(), 1.0f);
@@ -247,6 +248,7 @@ public class Main {
         glClearDepth(1f);
         glDepthFunc(GL_LEQUAL);
         glEnable(GL_CULL_FACE);
+        glClearStencil(0);
         glCullFace(GL_BACK);
         glLineWidth(1f);
         int maxUBOBindings = glGetInteger(GL_MAX_UNIFORM_BUFFER_BINDINGS);
@@ -313,7 +315,7 @@ public class Main {
             }
 
             glfwPollEvents();
-            glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+            glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
             
             Runnable r;
             while ((r = MAIN_TASKS.poll()) != null) {

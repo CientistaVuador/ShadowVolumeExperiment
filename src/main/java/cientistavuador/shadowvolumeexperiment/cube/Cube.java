@@ -40,6 +40,7 @@ public class Cube {
     public static final int CUBE_TEXTURE = CubeTexture.CUBE_TEXTURE;
     public static final int CUBE_TEXTURE_SPECULAR = CubeTexture.CUBE_TEXTURE_SPECULAR;
     public static final int SHADER_PROGRAM = CubeProgram.SHADER_PROGRAM;
+    public static final int SHADER_PROGRAM_SHADOW_VOLUME = CubeShadowVolumeProgram.SHADER_PROGRAM;
     public static final int VAO = CubeVAO.VAO;
     public static final int CUBE_COUNT = CubeVAO.CUBE_COUNT;
     public static final int CUBE_OFFSET = CubeVAO.CUBE_OFFSET;
