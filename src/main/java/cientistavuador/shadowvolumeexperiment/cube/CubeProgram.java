@@ -92,10 +92,18 @@ public class CubeProgram {
             layout (location = 0) out vec4 outputColor;
             
             void main() {
-                vec4 textureColor = texture(cubeTexture, texCoords);
+                bool noTexCoords = isnan(texCoords.x) || isnan(texCoords.y);
+                
+                vec4 textureColor = vec4((fragNormal + 1.0) / 2.0, 1.0);
+                if (!noTexCoords) {
+                    textureColor = texture(cubeTexture, texCoords);
+                }
                 textureColor.rgb = pow(textureColor.rgb, vec3(2.2));
                 
-                vec4 specularColor = texture(cubeTextureSpecular, texCoords);
+                vec4 specularColor = vec4(1.0);
+                if (!noTexCoords) {
+                    specularColor = texture(cubeTextureSpecular, texCoords);
+                }
                 specularColor.rgb = pow(specularColor.rrr, vec3(2.2));
                 
                 vec3 viewDir = normalize(camPosition - fragPosition);

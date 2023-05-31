@@ -24,67 +24,43 @@
  *
  * For more information, please refer to <https://unlicense.org>
  */
-package cientistavuador.shadowvolumeexperiment.cube;
+package cientistavuador.shadowvolumeexperiment.rifle;
 
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
+import cientistavuador.shadowvolumeexperiment.cube.Cube;
 import org.joml.Matrix4fc;
 
 /**
- *
  * @author Cien
  */
-public class Cube {
-
+public class Rifle extends Cube {
     
-    public static final int CUBE_TEXTURE = CubeTexture.CUBE_TEXTURE;
-    public static final int CUBE_TEXTURE_SPECULAR = CubeTexture.CUBE_TEXTURE_SPECULAR;
-    public static final int SHADER_PROGRAM = CubeProgram.SHADER_PROGRAM;
-    public static final int SHADER_PROGRAM_SHADOW_VOLUME = CubeShadowVolumeProgram.SHADER_PROGRAM;
-    public static final int VAO = CubeVAO.VAO;
-    public static final int CUBE_COUNT = CubeVAO.CUBE_COUNT;
-    public static final int CUBE_OFFSET = CubeVAO.CUBE_OFFSET;
-    public static final int CUBE_SHADOW_VOLUME_COUNT = CubeVAO.CUBE_SHADOW_VOLUME_COUNT;
-    public static final int CUBE_SHADOW_VOLUME_OFFSET = CubeVAO.CUBE_SHADOW_VOLUME_OFFSET;
-    
-    public static void init() {
-        
+    public Rifle(Matrix4fc model) {
+        super(model);
     }
 
-    private final Matrix4f model = new Matrix4f();
-    private final Matrix3f normalModel = new Matrix3f();
-    
-    public Cube(Matrix4fc model) {
-        this.model.set(model);
-        this.normalModel.set(new Matrix4f(model).invert().transpose());
-    }
-
+    @Override
     public int getVAO() {
-        return Cube.VAO;
-    }
-    
-    public int getCount() {
-        return Cube.CUBE_COUNT;
-    }
-    
-    public int getOffset() {
-        return Cube.CUBE_OFFSET;
-    }
-    
-    public int getShadowVolumeCount() {
-        return Cube.CUBE_SHADOW_VOLUME_COUNT;
-    }
-    
-    public int getShadowVolumeOffset() {
-        return Cube.CUBE_SHADOW_VOLUME_OFFSET;
-    }
-    
-    public Matrix4f getModel() {
-        return model;
+        return RifleVAO.VAO;
     }
 
-    public Matrix3f getNormalModel() {
-        return normalModel;
+    @Override
+    public int getCount() {
+        return RifleVAO.TEAPOT_COUNT;
+    }
+
+    @Override
+    public int getOffset() {
+        return RifleVAO.TEAPOT_OFFSET;
+    }
+
+    @Override
+    public int getShadowVolumeCount() {
+        return RifleVAO.TEAPOT_SHADOW_VOLUME_COUNT;
+    }
+
+    @Override
+    public int getShadowVolumeOffset() {
+        return RifleVAO.TEAPOT_SHADOW_VOLUME_OFFSET;
     }
     
 }
