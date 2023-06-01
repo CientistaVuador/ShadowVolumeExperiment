@@ -77,14 +77,12 @@ public class SkyBoxProgram {
                 const vec3 skyColor = vec3(0.2, 0.4, 0.6);
                 
                 vec3 viewDir = normalize(camPosition - fragPosition);
-                vec3 normal = viewDir;
-                vec3 reflectDir = -reflect(lightDirection, normal);
                 
                 vec3 resultColor = vec3(0.0);
                 
                 resultColor += lightDiffuse * skyColor;
-                resultColor += lightSpecular * pow(max(dot(viewDir, reflectDir), 0.0), 1024.0) * skyColor.bgr * skyColor.bgr * 5.0;
-                resultColor += lightSpecular * pow(max(dot(viewDir, reflectDir), 0.0), 32.0) * skyColor.bgr * skyColor.bgr * 1.25;
+                resultColor += lightSpecular * pow(max(dot(viewDir, lightDirection), 0.0), 1024.0) * skyColor.bgr * skyColor.bgr * 5.0;
+                resultColor += lightSpecular * pow(max(dot(viewDir, lightDirection), 0.0), 32.0) * skyColor.bgr * skyColor.bgr * 1.25;
                 resultColor += lightAmbient * skyColor;
                 
                 colorOutput = vec4(resultColor, 1.0);
