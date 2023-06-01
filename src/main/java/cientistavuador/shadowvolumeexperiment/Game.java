@@ -30,11 +30,13 @@ import cientistavuador.shadowvolumeexperiment.camera.FreeCamera;
 import cientistavuador.shadowvolumeexperiment.cube.Cube;
 import cientistavuador.shadowvolumeexperiment.cube.CubeProgram;
 import cientistavuador.shadowvolumeexperiment.cube.CubeShadowVolumeProgram;
+import cientistavuador.shadowvolumeexperiment.cube.CubeVAO;
 import cientistavuador.shadowvolumeexperiment.cube.light.directional.DirectionalLight;
 import cientistavuador.shadowvolumeexperiment.ubo.CameraUBO;
 import cientistavuador.shadowvolumeexperiment.ubo.UBOBindingPoints;
 import cientistavuador.shadowvolumeexperiment.debug.AabRender;
 import cientistavuador.shadowvolumeexperiment.rifle.Rifle;
+import cientistavuador.shadowvolumeexperiment.skybox.SkyBoxProgram;
 import cientistavuador.shadowvolumeexperiment.text.GLFontRenderer;
 import cientistavuador.shadowvolumeexperiment.text.GLFontSpecification;
 import cientistavuador.shadowvolumeexperiment.text.GLFontSpecifications;
@@ -175,6 +177,21 @@ public class Game {
         glStencilFunc(GL_ALWAYS, 0, 0xFF);
         //
         
+        glCullFace(GL_FRONT);
+        
+        glUseProgram(SkyBoxProgram.SHADER_PROGRAM);
+        glBindVertexArray(CubeVAO.VAO);
+        
+        SkyBoxProgram.sendUniforms(cameraProjectionView, new Vector3f().set(camera.getPosition()), sun);
+        glDrawElements(GL_TRIANGLES, CubeVAO.CUBE_COUNT, GL_UNSIGNED_INT, CubeVAO.CUBE_OFFSET);
+        
+        Main.NUMBER_OF_DRAWCALLS++;
+        Main.NUMBER_OF_VERTICES += CubeVAO.CUBE_COUNT;
+        
+        glBindVertexArray(0);
+        glUseProgram(0);
+        
+        glCullFace(GL_BACK);
         
         //render shadow volumes
         if (this.showShadowVolumes) {
@@ -212,7 +229,7 @@ public class Game {
                     }
             );
         }
-
+        
         Main.WINDOW_TITLE += " (DrawCalls: " + Main.NUMBER_OF_DRAWCALLS + ", Vertices: " + Main.NUMBER_OF_VERTICES + ")";
         Main.WINDOW_TITLE += " (x:" + (int) Math.floor(camera.getPosition().x()) + ",y:" + (int) Math.floor(camera.getPosition().y()) + ",z:" + (int) Math.ceil(camera.getPosition().z()) + ")";
         if (!this.textEnabled) {
