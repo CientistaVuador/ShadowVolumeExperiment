@@ -203,7 +203,7 @@ public class Game {
                                 .append("\tShift - Run\n")
                                 .append("\tAlt - Wander\n")
                                 .append("\tCtrl - Unlock/Lock mouse\n")
-                                .append("\tF - Spawn Cube (+Alt Spawns Rifle)\n")
+                                .append("\tF - Spawn Cube (+Alt Spawn Rifle)\n")
                                 .append("\tR - Remove Last Cube").append(" [").append(this.cubes.size() - 1).append(" Cubes]\n")
                                 .append("\tT - Hide This Wall of Text.\n")
                                 .append("\tV - ").append((this.showShadowVolumes ? "Hide" : "Show")).append(" Shadow Volumes.\n")
