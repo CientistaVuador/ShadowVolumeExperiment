@@ -137,16 +137,13 @@ public class Game {
         {
             glDepthMask(false);
             glColorMask(false, false, false, false);
+            glDisable(GL_CULL_FACE);
             {
-                glCullFace(GL_FRONT);
-                glStencilOp(GL_KEEP, GL_INCR, GL_KEEP);
+                glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+                glStencilOpSeparate(GL_BACK, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
                 renderShadowVolumes();
             }
-            {
-                glCullFace(GL_BACK);
-                glStencilOp(GL_KEEP, GL_DECR, GL_KEEP);
-                renderShadowVolumes();
-            }
+            glEnable(GL_CULL_FACE);
             glColorMask(true, true, true, true);
             glDepthMask(true);
         }
@@ -177,6 +174,8 @@ public class Game {
         glStencilFunc(GL_ALWAYS, 0, 0xFF);
         //
         
+        
+        //skybox
         glCullFace(GL_FRONT);
         
         glUseProgram(SkyBoxProgram.SHADER_PROGRAM);
@@ -192,6 +191,7 @@ public class Game {
         glUseProgram(0);
         
         glCullFace(GL_BACK);
+        //
         
         //render shadow volumes
         if (this.showShadowVolumes) {
