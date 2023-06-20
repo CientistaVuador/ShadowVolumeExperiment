@@ -28,7 +28,6 @@ package cientistavuador.shadowvolumeexperiment.clouds;
 
 import cientistavuador.shadowvolumeexperiment.cube.CubeVAO;
 import cientistavuador.shadowvolumeexperiment.cube.VerticesStream;
-import cientistavuador.shadowvolumeexperiment.debug.DebugCounter;
 import cientistavuador.shadowvolumeexperiment.util.ShadowVolumeGenerator;
 import static org.lwjgl.opengl.GL33C.*;
 
@@ -47,7 +46,8 @@ public class CloudsVAO {
         VAO = glGenVertexArrays();
         glBindVertexArray(VAO);
         
-        VerticesStream stream = CloudsMeshConvex.generateMesh();
+        //VerticesStream stream = CloudsMeshConvex.generateMesh();
+        VerticesStream stream = CloudsMesh.generateMesh();
         
         float[] vertices = stream.vertices();
         int[] indices = stream.indices();

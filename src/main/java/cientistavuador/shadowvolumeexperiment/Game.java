@@ -83,7 +83,7 @@ public class Game {
                 .scale(50f, 1f, 50f);
 
         cubes.add(new Cube(model));
-        cubes.add(this.clouds);
+        //cubes.add(this.clouds);
     }
 
     private void renderShadowVolumes() {
@@ -93,10 +93,10 @@ public class Game {
         CubeShadowVolumeProgram.sendPerFrameUniforms(cameraProjectionView, sun);
 
         for (Cube c : cubes) {
-            /*if (c instanceof Clouds) {
-            continue;
-            }*/
-
+            if (c == null || c instanceof Clouds) {
+                continue;
+            }
+            
             glBindVertexArray(c.getVAO());
 
             CubeShadowVolumeProgram.sendPerDrawUniforms(c.getModel(), c.getNormalModel());
@@ -115,38 +115,31 @@ public class Game {
         glUseProgram(Cube.SHADER_PROGRAM);
         CubeProgram.sendPerFrameUniforms(Cube.CUBE_TEXTURE, Cube.CUBE_TEXTURE_SPECULAR, new Matrix4f(this.camera.getProjectionView()), new Vector3f().set(camera.getPosition()), sun);
         for (Cube c : cubes) {
-            /*if (c instanceof Clouds) {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            glDisable(GL_CULL_FACE);
-            }*/
-            
             glBindVertexArray(c.getVAO());
 
-            CubeProgram.sendPerDrawUniforms(c.getModel(), c.getNormalModel());
+            CubeProgram.sendPerDrawUniforms(c.getModel(), c.getNormalModel(), c instanceof Clouds);
             glDrawElements(GL_TRIANGLES, c.getCount(), GL_UNSIGNED_INT, c.getOffset());
 
             Main.NUMBER_OF_DRAWCALLS++;
             Main.NUMBER_OF_VERTICES += c.getCount();
 
             glBindVertexArray(0);
-            
-            /*if (c instanceof Clouds) {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            glEnable(GL_CULL_FACE);
-            }*/
         }
         glUseProgram(0);
     }
 
     public void loop() {
-        cloudsRotation += Main.TPF * 0.5f;
+        /*cloudsRotation += Main.TPF * 0.15f;
         Matrix4f cloudsModel = new Matrix4f()
-                .scale(1f, 1f, 1f)
-                .translate(0f, 16f, 0f)
-                .rotateY((float) Math.toRadians(cloudsRotation))
-                ;
+        .scale(5f, 5f, 5f)
+        .translate(0f, 48f, 0f)
+        .rotateY((float) Math.toRadians(cloudsRotation))
+        ;
         clouds.getModel().set(cloudsModel);
         clouds.updateNormalModel();
+        if (cloudsRotation >= 360f) {
+        cloudsRotation = 0f;
+        }*/
         
         camera.updateMovement();
         Matrix4f cameraProjectionView = new Matrix4f(this.camera.getProjectionView());

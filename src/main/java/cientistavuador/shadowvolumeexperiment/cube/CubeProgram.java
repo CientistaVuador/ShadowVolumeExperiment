@@ -85,6 +85,8 @@ public class CubeProgram {
             uniform vec3 lightSpecular;
             uniform vec3 lightAmbient;
             
+            uniform bool clouds;
+            
             in vec3 fragPosition;
             in vec3 fragNormal;
             in vec2 texCoords;
@@ -99,6 +101,10 @@ public class CubeProgram {
                     textureColor = texture(cubeTexture, texCoords);
                 }
                 textureColor.rgb = pow(textureColor.rgb, vec3(2.2));
+            
+                if (clouds) {
+                    textureColor = vec4(0.65, 0.65, 0.65, 1.0);
+                }
                 
                 vec4 specularColor = vec4(1.0);
                 if (!noTexCoords) {
@@ -133,6 +139,7 @@ public class CubeProgram {
     public static final int LIGHT_AMBIENT_INDEX = glGetUniformLocation(SHADER_PROGRAM, "lightAmbient");
 
     public static final int CAM_POSITION_INDEX = glGetUniformLocation(SHADER_PROGRAM, "camPosition");
+    public static final int CLOUDS_POSITION_INDEX = glGetUniformLocation(SHADER_PROGRAM, "clouds");
     
     private static void sendMatrix(int location, Matrix4fc matrix) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -185,7 +192,7 @@ public class CubeProgram {
         }
     }
 
-    public static void sendPerDrawUniforms(Matrix4fc model, Matrix3fc normalModel) {
+    public static void sendPerDrawUniforms(Matrix4fc model, Matrix3fc normalModel, boolean clouds) {
         sendMatrix(MODEL_INDEX, model);
         
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -193,6 +200,8 @@ public class CubeProgram {
             normalModel.get(matrixBuffer);
             glUniformMatrix3fv(NORMAL_MODEL_INDEX, false, matrixBuffer);
         }
+        
+        glUniform1i(CLOUDS_POSITION_INDEX, (clouds ? 1 : 0));
     }
 
     private CubeProgram() {

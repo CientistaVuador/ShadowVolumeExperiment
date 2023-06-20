@@ -64,7 +64,7 @@ public class CloudsMeshConvex {
         VerticesStream stream = new VerticesStream();
 
         boolean[] processed = new boolean[width * height];
-
+        
         for (int i = 0; i < width * height; i++) {
             if (!data[i]) {
                 continue;
@@ -134,12 +134,14 @@ public class CloudsMeshConvex {
             float sizeY = 0.5f * scaleY;
             float sizeZ = scaleZ;
             
-            float xP = vX + sizeX;
-            float xN = vX;
-            float yP = sizeY;
-            float yN = -sizeY;
-            float zP = vZ;
-            float zN = vZ - sizeZ;
+            final float bias = 0.00005f;
+            
+            float xP = vX + sizeX - bias;
+            float xN = vX + bias;
+            float yP = sizeY - bias;
+            float yN = -sizeY + bias;
+            float zP = vZ - bias;
+            float zN = vZ - sizeZ + bias;
 
             //TOP
             stream.offset();
