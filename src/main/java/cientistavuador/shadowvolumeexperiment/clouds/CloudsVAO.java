@@ -47,7 +47,7 @@ public class CloudsVAO {
         VAO = glGenVertexArrays();
         glBindVertexArray(VAO);
         
-        VerticesStream stream = CloudsMesh.generateMesh();;
+        VerticesStream stream = CloudsMeshConvex.generateMesh();
         
         float[] vertices = stream.vertices();
         int[] indices = stream.indices();
