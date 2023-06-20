@@ -40,6 +40,7 @@ import org.joml.Vector3f;
  */
 public class ShadowVolumeGenerator {
 
+    //TODO: TAKE NORMALS IN CONSIDERATION
     //must be flat shaded
     //the first 3 floats must be the position XYZ
     //slightly based on https://gamedev.stackexchange.com/questions/106742/generate-mesh-of-shadow-volume

@@ -24,39 +24,40 @@
  *
  * For more information, please refer to <https://unlicense.org>
  */
-package cientistavuador.shadowvolumeexperiment.rifle;
+package cientistavuador.shadowvolumeexperiment.clouds;
 
 import cientistavuador.shadowvolumeexperiment.cube.CubeVAO;
+import cientistavuador.shadowvolumeexperiment.cube.VerticesStream;
+import cientistavuador.shadowvolumeexperiment.debug.DebugCounter;
 import cientistavuador.shadowvolumeexperiment.util.ShadowVolumeGenerator;
-import java.util.Map;
 import static org.lwjgl.opengl.GL33C.*;
 
 /**
  *
  * @author Cien
  */
-public class RifleVAO {
+public class CloudsVAO {
     public static final int VAO;
-    public static final int RIFLE_COUNT;
-    public static final int RIFLE_OFFSET;
-    public static final int RIFLE_SHADOW_VOLUME_COUNT;
-    public static final int RIFLE_SHADOW_VOLUME_OFFSET;
+    public static final int CLOUDS_COUNT;
+    public static final int CLOUDS_OFFSET;
+    public static final int CLOUDS_SHADOW_VOLUME_COUNT;
+    public static final int CLOUDS_SHADOW_VOLUME_OFFSET;
 
     static {
         VAO = glGenVertexArrays();
         glBindVertexArray(VAO);
         
-        Map.Entry<float[], int[]> mesh = RifleMesh.readMesh();
+        VerticesStream stream = CloudsMesh.generateMesh();;
         
-        float[] vertices = mesh.getKey();
+        float[] vertices = stream.vertices();
+        int[] indices = stream.indices();
         
-        int[] indices = mesh.getValue();
         int[] volumeIndices = ShadowVolumeGenerator.generateShadowVolumeIndices(vertices, CubeVAO.VERTEX_SIZE_ELEMENTS, indices);
         
-        RIFLE_COUNT = indices.length;
-        RIFLE_OFFSET = 0;
-        RIFLE_SHADOW_VOLUME_COUNT = volumeIndices.length;
-        RIFLE_SHADOW_VOLUME_OFFSET = indices.length * Integer.BYTES;
+        CLOUDS_COUNT = indices.length;
+        CLOUDS_OFFSET = 0;
+        CLOUDS_SHADOW_VOLUME_COUNT = volumeIndices.length;
+        CLOUDS_SHADOW_VOLUME_OFFSET = indices.length * Integer.BYTES;
         
         int[] mixedIndices = new int[indices.length + volumeIndices.length];
         System.arraycopy(indices, 0, mixedIndices, 0, indices.length);
@@ -90,7 +91,7 @@ public class RifleVAO {
         glBindVertexArray(0);
     }
 
-    private RifleVAO() {
+    private CloudsVAO() {
 
     }
 }

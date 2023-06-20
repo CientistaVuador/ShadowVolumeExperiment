@@ -24,43 +24,43 @@
  *
  * For more information, please refer to <https://unlicense.org>
  */
-package cientistavuador.shadowvolumeexperiment.rifle;
+package cientistavuador.shadowvolumeexperiment.clouds;
 
 import cientistavuador.shadowvolumeexperiment.cube.Cube;
 import org.joml.Matrix4fc;
 
 /**
+ *
  * @author Cien
  */
-public class Rifle extends Cube {
+public class Clouds extends Cube {
     
-    public Rifle(Matrix4fc model) {
+    public Clouds(Matrix4fc model) {
         super(model);
     }
 
     @Override
     public int getVAO() {
-        return RifleVAO.VAO;
+        return CloudsVAO.VAO;
     }
 
     @Override
     public int getCount() {
-        return RifleVAO.RIFLE_COUNT;
+        return CloudsVAO.CLOUDS_COUNT;
     }
 
     @Override
     public int getOffset() {
-        return RifleVAO.RIFLE_OFFSET;
+        return CloudsVAO.CLOUDS_OFFSET;
     }
 
     @Override
     public int getShadowVolumeCount() {
-        return RifleVAO.RIFLE_SHADOW_VOLUME_COUNT;
+        return CloudsVAO.CLOUDS_SHADOW_VOLUME_COUNT;
     }
 
     @Override
     public int getShadowVolumeOffset() {
-        return RifleVAO.RIFLE_SHADOW_VOLUME_OFFSET;
+        return CloudsVAO.CLOUDS_SHADOW_VOLUME_OFFSET;
     }
-    
 }

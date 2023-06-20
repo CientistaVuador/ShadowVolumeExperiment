@@ -27,6 +27,7 @@
 package cientistavuador.shadowvolumeexperiment;
 
 import cientistavuador.shadowvolumeexperiment.camera.FreeCamera;
+import cientistavuador.shadowvolumeexperiment.clouds.Clouds;
 import cientistavuador.shadowvolumeexperiment.cube.Cube;
 import cientistavuador.shadowvolumeexperiment.cube.CubeProgram;
 import cientistavuador.shadowvolumeexperiment.cube.CubeShadowVolumeProgram;
@@ -60,6 +61,9 @@ public class Game {
         return GAME;
     }
 
+    private final Clouds clouds = new Clouds(new Matrix4f());
+    private float cloudsRotation = 0f;
+    
     private final FreeCamera camera = new FreeCamera();
     private final DirectionalLight sun = new DirectionalLight();
     private final List<Cube> cubes = new ArrayList<>();
@@ -77,7 +81,9 @@ public class Game {
         Matrix4f model = new Matrix4f()
                 .translate(0f, -0.5f, 0f)
                 .scale(50f, 1f, 50f);
+
         cubes.add(new Cube(model));
+        cubes.add(this.clouds);
     }
 
     private void renderShadowVolumes() {
@@ -87,21 +93,61 @@ public class Game {
         CubeShadowVolumeProgram.sendPerFrameUniforms(cameraProjectionView, sun);
 
         for (Cube c : cubes) {
+            /*if (c instanceof Clouds) {
+            continue;
+            }*/
+
             glBindVertexArray(c.getVAO());
-            
+
             CubeShadowVolumeProgram.sendPerDrawUniforms(c.getModel(), c.getNormalModel());
             glDrawElements(GL_TRIANGLES, c.getShadowVolumeCount(), GL_UNSIGNED_INT, c.getShadowVolumeOffset());
 
             Main.NUMBER_OF_DRAWCALLS++;
             Main.NUMBER_OF_VERTICES += c.getShadowVolumeCount();
-            
+
             glBindVertexArray(0);
         }
 
-        glUseProgram(0); 
+        glUseProgram(0);
+    }
+
+    private void renderCubes() {
+        glUseProgram(Cube.SHADER_PROGRAM);
+        CubeProgram.sendPerFrameUniforms(Cube.CUBE_TEXTURE, Cube.CUBE_TEXTURE_SPECULAR, new Matrix4f(this.camera.getProjectionView()), new Vector3f().set(camera.getPosition()), sun);
+        for (Cube c : cubes) {
+            /*if (c instanceof Clouds) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            glDisable(GL_CULL_FACE);
+            }*/
+            
+            glBindVertexArray(c.getVAO());
+
+            CubeProgram.sendPerDrawUniforms(c.getModel(), c.getNormalModel());
+            glDrawElements(GL_TRIANGLES, c.getCount(), GL_UNSIGNED_INT, c.getOffset());
+
+            Main.NUMBER_OF_DRAWCALLS++;
+            Main.NUMBER_OF_VERTICES += c.getCount();
+
+            glBindVertexArray(0);
+            
+            /*if (c instanceof Clouds) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            glEnable(GL_CULL_FACE);
+            }*/
+        }
+        glUseProgram(0);
     }
 
     public void loop() {
+        cloudsRotation += Main.TPF * 0.5f;
+        Matrix4f cloudsModel = new Matrix4f()
+                .scale(1f, 1f, 1f)
+                .translate(0f, 16f, 0f)
+                .rotateY((float) Math.toRadians(cloudsRotation))
+                ;
+        clouds.getModel().set(cloudsModel);
+        clouds.updateNormalModel();
+        
         camera.updateMovement();
         Matrix4f cameraProjectionView = new Matrix4f(this.camera.getProjectionView());
 
@@ -111,25 +157,11 @@ public class Game {
 
         glStencilFunc(GL_ALWAYS, 0, 0xFF);
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-        
+
         //render ambient only
         sun.getLightMode().ambientOnly();
-        glUseProgram(Cube.SHADER_PROGRAM);
-        CubeProgram.sendPerFrameUniforms(Cube.CUBE_TEXTURE, Cube.CUBE_TEXTURE_SPECULAR, cameraProjectionView, new Vector3f().set(camera.getPosition()), sun);
-        for (Cube c : cubes) {
-            glBindVertexArray(c.getVAO());
-            
-            CubeProgram.sendPerDrawUniforms(c.getModel(), c.getNormalModel());
-            glDrawElements(GL_TRIANGLES, c.getCount(), GL_UNSIGNED_INT, c.getOffset());
-
-            Main.NUMBER_OF_DRAWCALLS++;
-            Main.NUMBER_OF_VERTICES += c.getCount();
-            
-            glBindVertexArray(0);
-        }
-        glUseProgram(0);
+        renderCubes();
         //
-        
         
         //render shadow volumes to the stencil buffer (z-fail method)
         glDepthFunc(GL_LESS);
@@ -152,47 +184,32 @@ public class Game {
 
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
         //
-        
-        
+
         //render light again
         sun.getLightMode().enableAll();
-        glUseProgram(Cube.SHADER_PROGRAM);
-        CubeProgram.sendPerFrameUniforms(Cube.CUBE_TEXTURE, Cube.CUBE_TEXTURE_SPECULAR, cameraProjectionView, new Vector3f().set(camera.getPosition()), sun);
-        for (Cube c : cubes) {
-            glBindVertexArray(c.getVAO());
-            
-            CubeProgram.sendPerDrawUniforms(c.getModel(), c.getNormalModel());
-            glDrawElements(GL_TRIANGLES, c.getCount(), GL_UNSIGNED_INT, c.getOffset());
+        renderCubes();
 
-            Main.NUMBER_OF_DRAWCALLS++;
-            Main.NUMBER_OF_VERTICES += c.getCount();
-            
-            glBindVertexArray(0);
-        }
-        glUseProgram(0);
-        
         glStencilFunc(GL_ALWAYS, 0, 0xFF);
         //
-        
-        
+
         //skybox
         glCullFace(GL_FRONT);
-        
+
         glUseProgram(SkyBoxProgram.SHADER_PROGRAM);
         glBindVertexArray(CubeVAO.VAO);
-        
+
         SkyBoxProgram.sendUniforms(cameraProjectionView, new Vector3f().set(camera.getPosition()), sun);
         glDrawElements(GL_TRIANGLES, CubeVAO.CUBE_COUNT, GL_UNSIGNED_INT, CubeVAO.CUBE_OFFSET);
-        
+
         Main.NUMBER_OF_DRAWCALLS++;
         Main.NUMBER_OF_VERTICES += CubeVAO.CUBE_COUNT;
-        
+
         glBindVertexArray(0);
         glUseProgram(0);
-        
+
         glCullFace(GL_BACK);
         //
-        
+
         //render shadow volumes
         if (this.showShadowVolumes) {
             glDepthFunc(GL_LESS);
@@ -229,7 +246,7 @@ public class Game {
                     }
             );
         }
-        
+
         Main.WINDOW_TITLE += " (DrawCalls: " + Main.NUMBER_OF_DRAWCALLS + ", Vertices: " + Main.NUMBER_OF_VERTICES + ")";
         Main.WINDOW_TITLE += " (x:" + (int) Math.floor(camera.getPosition().x()) + ",y:" + (int) Math.floor(camera.getPosition().y()) + ",z:" + (int) Math.ceil(camera.getPosition().z()) + ")";
         if (!this.textEnabled) {
@@ -271,7 +288,7 @@ public class Game {
             }
         }
         if (key == GLFW_KEY_R && action == GLFW_PRESS) {
-            if (cubes.size() > 1) {
+            if (cubes.size() > 2) {
                 cubes.remove(cubes.size() - 1);
             }
         }

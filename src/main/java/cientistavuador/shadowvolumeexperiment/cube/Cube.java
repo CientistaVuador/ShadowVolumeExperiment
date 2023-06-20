@@ -87,4 +87,8 @@ public class Cube {
         return normalModel;
     }
     
+    public void updateNormalModel() {
+        this.normalModel.set(new Matrix4f(model).invert().transpose());
+    }
+    
 }
